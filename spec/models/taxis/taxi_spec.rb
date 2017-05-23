@@ -14,9 +14,9 @@ RSpec.describe Taxis::Taxi, type: :model do
       location1 = Location.create(lattitude: 4.3, longitude: 5.4)
       location2 = Location.create(lattitude: 5.3, longitude: 6.4)
       location3 = Location.create(lattitude: 6.3, longitude: 7.4)
-      Taxis::Taxi.create(location_id: location1.id)
-      Taxis::Taxi.create(location_id: location2.id)
-      Taxis::Taxi.create(location_id: location3.id)
+      Taxis::Taxi.create(location_id: location1.id, available: true)
+      Taxis::Taxi.create(location_id: location2.id, available: true)
+      Taxis::Taxi.create(location_id: location3.id, available: true)
 
       expect(Location).to receive(:get_distance_from).with(user_location, location1).and_return(2.89)
       expect(Location).to receive(:get_distance_from).with(user_location, location2).and_return(3.89)
@@ -31,13 +31,28 @@ RSpec.describe Taxis::Taxi, type: :model do
       user_location = Location.create(lattitude: 3.3, longitude: 4.4)
       location1 = Location.create(lattitude: 4.3, longitude: 5.4)
       location2 = Location.create(lattitude: 5.3, longitude: 6.4)
-      Taxis::Pink.create(location_id: location1.id)
-      Taxis::Taxi.create(location_id: location2.id)
+      Taxis::Pink.create(location_id: location1.id, available: true)
+      Taxis::Taxi.create(location_id: location2.id, available: true)
 
       expect(Location).to receive(:get_distance_from).with(user_location, location1).and_return(2.89)
       expect(Location).to_not receive(:get_distance_from).with(user_location, location2)
 
       nearest_taxi = Taxis::Taxi.get_nearest user_location, Taxis::Pink
+
+      expect(nearest_taxi.current_location).to eql(location1)
+    end
+
+    it 'should return only available taxis' do
+      user_location = Location.create(lattitude: 3.3, longitude: 4.4)
+      location1 = Location.create(lattitude: 4.3, longitude: 5.4)
+      location2 = Location.create(lattitude: 5.3, longitude: 6.4)
+      Taxis::Taxi.create(location_id: location1.id, available: true)
+      Taxis::Taxi.create(location_id: location2.id, available: false)
+
+      expect(Location).to receive(:get_distance_from).with(user_location, location1).and_return(2.89)
+      expect(Location).to_not receive(:get_distance_from).with(user_location, location2)
+
+      nearest_taxi = Taxis::Taxi.get_nearest user_location
 
       expect(nearest_taxi.current_location).to eql(location1)
     end

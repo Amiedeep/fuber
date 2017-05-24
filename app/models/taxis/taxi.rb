@@ -11,7 +11,9 @@ module Taxis
         taxi_distance_mapping[taxi_distance] = taxi
       }
 
-      taxi_distance_mapping.min_by { |key| key}.last
+      nearest_taxi_distance = taxi_distance_mapping.min_by { |key| key}
+
+      return nearest_taxi_distance.last if nearest_taxi_distance
     end
   end
 end

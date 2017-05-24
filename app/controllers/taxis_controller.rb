@@ -14,9 +14,22 @@ class TaxisController < ApplicationController
     end
   end
 
+  def end_ride
+    @location = Location.new(location_params)
+    @location.save
+    @taxi = Taxis::Taxi.where(taxi_params).first
+    @taxi.update_attributes({available: true, location_id: @location.id})
+
+    render :nothing => true, :status => 200, :content_type => 'text/html'
+  end
+
   private
   def type_param
     params.permit(:type)
+  end
+
+  def taxi_params
+    params.permit(:id)
   end
 
   def location_params

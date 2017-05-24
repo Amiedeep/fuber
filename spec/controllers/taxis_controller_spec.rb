@@ -31,4 +31,20 @@ RSpec.describe TaxisController, type: :controller do
     end
   end
 
+  describe "GET #end_ride" do
+    it "return ok and set availability of taxi and update location" do
+      location = double("Location", id: 34)
+      taxi = [double('Taxi', location_id: 'some_id')]
+
+      expect(Location).to receive(:new).and_return(location)
+      expect(location).to receive(:save)
+      expect(Taxis::Taxi).to receive(:where).and_return(taxi)
+      expect(taxi.first).to receive(:update_attributes).with({available: true, location_id: 34})
+
+      get :end_ride, params: {location: {lattitude: 5.3, longitude: 6.3}, id: 123}
+
+      expect(response).to have_http_status(:success)
+    end
+  end
+
 end
